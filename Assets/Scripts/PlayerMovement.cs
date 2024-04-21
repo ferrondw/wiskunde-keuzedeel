@@ -20,7 +20,6 @@ public class PlayerMovement : MonoBehaviour
     public UnityEvent onPeakJump;
     public UnityEvent onLandJump;
     [Space(20)]
-    public UnityEvent onHit;
     public UnityEvent onDeath;
     
 
@@ -35,6 +34,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        // dev shit, gaat als game loop af is weg
         if (Input.GetKeyDown(KeyCode.Backspace))
         {
             Die();
@@ -43,6 +43,8 @@ public class PlayerMovement : MonoBehaviour
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
+
+        if (currentState == State.None) return; // als je niet in een state zit, check dan ook niet wat er gebeurd als je wel in een state zit
         
         // als je springt
         if (Input.GetKeyDown(KeyCode.Space) && currentState == State.Grounded)
@@ -92,7 +94,7 @@ public class PlayerMovement : MonoBehaviour
     private void Jump()
     {
         // verander de player state 
-        // currentState = State.Airborne;
+        currentState = State.Airborne;
         parabolicFunction = new ParabolicFunction(gravity, initialVelocity, transform.position.y);
         onBeginJump?.Invoke();
         
@@ -137,5 +139,12 @@ public class PlayerMovement : MonoBehaviour
         transform.position = new Vector2(transform.position.x, 0);
         onLandJump?.Invoke();
         currentState = State.Grounded;
+    }
+
+    public void ResetScene()
+    {
+        // moet eigenlijk in een ander script maar is voor nu wel ok
+        // ik gebruik dit in de onDeath UnityEvent
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
