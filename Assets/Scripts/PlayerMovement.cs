@@ -64,11 +64,11 @@ public class PlayerMovement : MonoBehaviour
     {
         float startTime = Time.time;
 
-        while (Time.time - startTime < 1f)
+        while (Time.time - startTime < 0.6f)
         {
             float elapsedTime = Time.time - startTime;
 
-            float jumpProgress = elapsedTime / 1f;
+            float jumpProgress = elapsedTime / 0.6f;
             int jumpFrameIndex = Mathf.FloorToInt(jumpProgress * flipBookManager.Die.frames.Length);
             flipBookManager.SetDieFrame(jumpFrameIndex);
 

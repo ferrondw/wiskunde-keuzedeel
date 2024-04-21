@@ -9,7 +9,7 @@ public class Spawner : MonoBehaviour
 
     private void Start()
     {
-        Invoke(nameof(SpawnTile), 4);
+        Invoke(nameof(SpawnTile), 0);
     }
 
     private void SpawnTile()
