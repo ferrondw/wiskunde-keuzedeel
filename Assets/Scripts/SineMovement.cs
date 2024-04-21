@@ -17,6 +17,6 @@ public class SineMovement : MonoBehaviour
     private void Update()
     {
         float yOffset = sineFunction.y(Time.time);
-        transform.position = startPos + new Vector3(0, yOffset, 0);
+        transform.position =  new Vector3(transform.position.x, startPos.y + yOffset);
     }
 }

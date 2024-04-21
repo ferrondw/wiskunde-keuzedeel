@@ -9,6 +9,7 @@ public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private FlipBookManager flipBookManager;
     [SerializeField] private Text stateText;
+    [SerializeField] private Text coinText;
     [SerializeField] private float runFPS;
     
     [Header("Jump Variables")]
@@ -19,13 +20,13 @@ public class PlayerMovement : MonoBehaviour
     public UnityEvent onBeginJump;
     public UnityEvent onPeakJump;
     public UnityEvent onLandJump;
-    [Space(20)]
     public UnityEvent onDeath;
-    
+
+    private int coins;
 
     private ParabolicFunction parabolicFunction;
-    private State currentState = State.Grounded;
-    private enum State
+    public State currentState = State.Grounded;
+    public enum State
     {
         None,
         Airborne,
@@ -34,23 +35,13 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        // dev shit, gaat als game loop af is weg
-        if (Input.GetKeyDown(KeyCode.Backspace))
-        {
-            Die();
-        }
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        }
-
         if (currentState == State.None) return; // als je niet in een state zit, check dan ook niet wat er gebeurd als je wel in een state zit
         
         // als je springt
         if (Input.GetKeyDown(KeyCode.Space) && currentState == State.Grounded)
         {
             StopAllCoroutines();
-            Jump();
+            Jump(initialVelocity);
         }
         // als je runt
         else if (currentState == State.Grounded)
@@ -63,7 +54,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void Die()
+    public void Die()
     {
         StopAllCoroutines();
         StartCoroutine(PerformDeath());
@@ -73,11 +64,11 @@ public class PlayerMovement : MonoBehaviour
     {
         float startTime = Time.time;
 
-        while (Time.time - startTime < 1.5f)
+        while (Time.time - startTime < 1f)
         {
             float elapsedTime = Time.time - startTime;
 
-            float jumpProgress = elapsedTime / 1.5f;
+            float jumpProgress = elapsedTime / 1f;
             int jumpFrameIndex = Mathf.FloorToInt(jumpProgress * flipBookManager.Die.frames.Length);
             flipBookManager.SetDieFrame(jumpFrameIndex);
 
@@ -91,11 +82,11 @@ public class PlayerMovement : MonoBehaviour
         currentState = State.None;
     }
 
-    private void Jump()
+    public void Jump(float iV)
     {
         // verander de player state 
         currentState = State.Airborne;
-        parabolicFunction = new ParabolicFunction(gravity, initialVelocity, transform.position.y);
+        parabolicFunction = new ParabolicFunction(gravity, iV, transform.position.y);
         onBeginJump?.Invoke();
         
         // kijk hoe lang de jump duurt om naar zijn 2de nul punt te komen en start de jump met die info
@@ -146,5 +137,12 @@ public class PlayerMovement : MonoBehaviour
         // moet eigenlijk in een ander script maar is voor nu wel ok
         // ik gebruik dit in de onDeath UnityEvent
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void GetCoin()
+    {
+        coins++;
+        var txt = coins == 1 ? "Coin" : "Coins";
+        coinText.text = $"{coins} {txt}";
     }
 }
